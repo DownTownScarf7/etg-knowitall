@@ -1,0 +1,26 @@
+{
+  "name": "etg-knowitall",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DownTownScarf7/etg-knowitall.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DownTownScarf7/etg-knowitall/issues"
+  },
+  "homepage": "https://github.com/DownTownScarf7/etg-knowitall#readme",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "mysql": "^2.16.0"
+  }
+}
