@@ -17,24 +17,21 @@ window.onload = () => {
     mainDiv.appendChild(subDiv);
     for (let i in res.dataGungeoneers) {
       const gungeoneer = res.dataGungeoneers[i];
+      const wikiLink = document.createElement('a');
       const img = document.createElement('img');
-      const div = document.createElement('div');
+      wikiLink.href = gungeoneer.wikiLink;
+      wikiLink.target = '_blank';
       img.classList.add('icon', 'gungeoneer');
       img.src = gungeoneer.icon;
-      subDiv.appendChild(div);
-      div.appendChild(img);
+      subDiv.appendChild(wikiLink);
+      wikiLink.appendChild(img);
     }
   };
   requestGungeoneers.send();
 
   document.querySelector('#search').addEventListener('keydown', event => {
-    console.log(event.key);
-  });
-
-  document.querySelector('#response-container').addEventListener('mouseover', event => {
-    if (event.target.classList.contains('icon')) {
-      console.log(event.target);
-    }
+    // Placeholder
+    console.log(event.target.value);
   });
 
   document.querySelector('#guns').appendChild(document.createElement('h3')).innerText = 'GUNS';
