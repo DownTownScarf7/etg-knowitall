@@ -42,10 +42,12 @@ request(urlGungeoneers, (err, res, body) => {
       const startingWeapons = {};
 
       weapons.find('a').not('.image').each(function (index) {
+        const gunImg = $(this).prev('.image').children('img');
         startingWeapons[$(this).attr('href').substring(1)] = {
           gunName: $(this).attr('title'),
           gunLink: $(this).attr('href'),
-          gunSrc: $(this).prev('.image').children('img').attr('src'),
+          gunSrc: gunImg.attr('src'),
+          gunImgSize: { width: gunImg.attr('width'), height: gunImg.attr('height') },
           }
       });
 
