@@ -22,6 +22,8 @@ app.use(express.json());
 const urlGamepedia = 'https://enterthegungeon.gamepedia.com';
 const urlGungeoneers = 'https://enterthegungeon.gamepedia.com/Gungeoneers';
 const dataGungeoneers = {};
+const dataGuns = {};
+const dataItems = {};
 
 request(urlGungeoneers, (err, res, body) => {
   if (err) {
@@ -31,12 +33,26 @@ request(urlGungeoneers, (err, res, body) => {
   const $ = cheerio.load(body);
   $('#mw-content-text table tr').each(function () {
     if ($(this).children('td').length > 0) {
-      const name = $(this).children('td').eq(0).find('a').attr('title');
-      const icon = $(this).children('td').eq(0).find('img').attr('src');
-      const href = $(this).children('td').eq(0).find('a').attr('href');
+      const gungeoneer = $(this).children('td').eq(0);
+      const weapons = $(this).children('td').eq(1);
+      const items = $(this).children('td').eq(2);
+      const name = gungeoneer.find('a').attr('title');
+      const icon = gungeoneer.find('img').attr('src');
+      const href = gungeoneer.eq(0).find('a').attr('href');
+      const startingWeapons = {};
+
+      weapons.find('a').not('.image').each(function (index) {
+        startingWeapons[$(this).attr('href').substring(1)] = {
+          gunName: $(this).attr('title'),
+          gunLink: $(this).attr('href'),
+          gunSrc: $(this).prev('.image').children('img').attr('src'),
+          }
+      });
+
       dataGungeoneers[href.substring(1)] = {
         name,
         icon,
+        startingWeapons,
         wikiLink: `${urlGamepedia}${href}`,
       };
     };
