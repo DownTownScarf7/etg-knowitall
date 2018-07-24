@@ -20,7 +20,7 @@ app.use(express.json());
 // });
 
 const urlGungeoneers = 'https://enterthegungeon.gamepedia.com/Gungeoneers';
-const iconGungeoneers = [];
+const dataGungeoneers = {};
 
 request(urlGungeoneers, (err, res, body) => {
   if (err) {
@@ -30,10 +30,17 @@ request(urlGungeoneers, (err, res, body) => {
   const $ = cheerio.load(body);
   $('#mw-content-text table tr').each(function () {
     if ($(this).children('td').length > 0) {
-      iconGungeoneers.push($(this).children('td').eq(0).find('img').attr('src'));
-    }
+      const name = $(this).children('td').eq(0).find('a').attr('title');
+      const icon = $(this).children('td').eq(0).find('img').attr('src');
+      const href = $(this).children('td').eq(0).find('a').attr('href');
+      dataGungeoneers[href.substring(1)] = {
+        name,
+        icon,
+        wikiLink: `${urlGungeoneers}${href}`,
+      };
+    };
   });
-  console.log(iconGungeoneers);
+  console.log(dataGungeoneers);
 });
 
 app.get('/', (req, res) => {
@@ -42,7 +49,7 @@ app.get('/', (req, res) => {
 
 app.get('/api', (req, res) => {
   res.json({
-    iconGungeoneers,
+    dataGungeoneers,
   });
 });
 
