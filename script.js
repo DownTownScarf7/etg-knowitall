@@ -19,12 +19,28 @@ window.onload = () => {
       const gungeoneer = res.dataGungeoneers[i];
       const wikiLink = document.createElement('a');
       const img = document.createElement('img');
+      const div = document.createElement('div');
+      const descBox = document.createElement('div');
+      const descBoxWeaponsDiv = document.createElement('div');
+      const descBoxItemsDiv = document.createElement('div');
+
+      div.classList.add('valid');
       wikiLink.href = gungeoneer.wikiLink;
       wikiLink.target = '_blank';
       img.classList.add('icon', 'gungeoneer');
       img.src = gungeoneer.icon;
-      subDiv.appendChild(wikiLink);
+
+      subDiv.appendChild(div);
+      div.appendChild(wikiLink);
       wikiLink.appendChild(img);
+
+      descBox.classList.add('description-box');
+      descBox.appendChild(document.createElement('h3')).innerText = gungeoneer.name;
+      descBox.appendChild(descBoxWeaponsDiv);
+      descBox.appendChild(descBoxItemsDiv);
+      descBoxWeaponsDiv.appendChild(document.createElement('h4')).innerText = 'Starting Weapons';
+      descBoxItemsDiv.appendChild(document.createElement('h4')).innerText = 'Starting Items';
+      div.appendChild(descBox);
     }
   };
   requestGungeoneers.send();
