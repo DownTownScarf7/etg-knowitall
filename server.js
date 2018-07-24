@@ -20,16 +20,16 @@ app.use(express.json());
 // });
 
 const urlGamepedia = 'https://enterthegungeon.gamepedia.com';
-const urlGungeoneers = 'https://enterthegungeon.gamepedia.com/Gungeoneers';
 const dataGungeoneers = {};
 const dataGuns = {};
 const dataItems = {};
 
-request(urlGungeoneers, (err, res, body) => {
+request(`${urlGamepedia}/Gungeoneers`, (err, res, body) => {
   if (err) {
     console.error(err);
     return;
   }
+
   const $ = cheerio.load(body);
   $('#mw-content-text table tr').each(function () {
     if ($(this).children('td').length > 0) {
@@ -73,6 +73,41 @@ request(urlGungeoneers, (err, res, body) => {
   });
 });
 
+request(`${urlGamepedia}/Guns`, (err, res, body) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  const $ = cheerio.load(body);
+  $('table tbody tr').each(function () {
+    const columns = $(this).find('td');
+
+    if (columns.length > 0) {
+      dataGuns[columns.eq(1).children('a').attr('href').substring(1)] = {
+        gunImg: columns.eq(0).html(),
+        gunName: columns.eq(1).children('a').text(),
+        gunWikiLink: `${urlGamepedia}${columns.eq(1).children('a').attr('href')}`,
+        gunQuote: columns.eq(2).text(),
+        gunQuality: columns.eq(3).children().html(),
+        gunType: columns.eq(4).text(),
+        gunStats: {
+          magSize: columns.eq(5).html(),
+          ammoCap: columns.eq(6).text(),
+          damage: columns.eq(7).text(),
+          fireRate: columns.eq(8).text(),
+          reloadTime: columns.eq(9).text(),
+          shotSpeed: columns.eq(10).html(),
+          range: columns.eq(11).html(),
+          force: columns.eq(12).html(),
+          spread: columns.eq(13).text(),
+        },
+        gunSmallNotes: columns.eq(14).text(),
+      }
+    }
+  });
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -80,6 +115,7 @@ app.get('/', (req, res) => {
 app.get('/api', (req, res) => {
   res.json({
     dataGungeoneers,
+    dataGuns,
   });
 });
 
