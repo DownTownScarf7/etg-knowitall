@@ -40,6 +40,7 @@ request(urlGungeoneers, (err, res, body) => {
       const icon = gungeoneer.find('img').attr('src');
       const href = gungeoneer.eq(0).find('a').attr('href');
       const startingWeapons = {};
+      const startingItems = {};
 
       weapons.find('a').not('.image').each(function (index) {
         const gunImg = $(this).prev('.image').children('img');
@@ -51,15 +52,25 @@ request(urlGungeoneers, (err, res, body) => {
           }
       });
 
+      items.find('a').not('.image').each(function (index) {
+        const itemImg = $(this).prev('.image').children('img');
+        startingItems[$(this).attr('href').substring(1)] = {
+          itemName: $(this).attr('title'),
+          itemLink: $(this).attr('href'),
+          itemSrc: itemImg.attr('src'),
+          itemImgSize: { width: itemImg.attr('width'), height: itemImg.attr('height') },
+          }
+      });
+
       dataGungeoneers[href.substring(1)] = {
         name,
         icon,
         startingWeapons,
+        startingItems,
         wikiLink: `${urlGamepedia}${href}`,
       };
     };
   });
-  console.log(dataGungeoneers);
 });
 
 app.get('/', (req, res) => {
