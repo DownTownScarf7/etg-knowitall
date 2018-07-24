@@ -39,6 +39,22 @@ window.onload = () => {
       descBox.appendChild(descBoxWeaponsDiv);
       descBox.appendChild(descBoxItemsDiv);
       descBoxWeaponsDiv.appendChild(document.createElement('h4')).innerText = 'Starting Weapons';
+      for (let j in gungeoneer.startingWeapons) {
+        const gun = gungeoneer.startingWeapons[j];
+
+        const gunDiv = document.createElement('div');
+        const gunPara = document.createElement('p');
+        const gunImg = document.createElement('img');
+
+        gunImg.src = gun.gunSrc;
+        gunImg.width = gun.gunImgSize.width;
+        gunImg.height = gun.gunImgSize.height;
+        gunImg.classList.add('description-icon');
+        descBoxWeaponsDiv.appendChild(gunDiv);
+        gunDiv.appendChild(gunImg);
+        gunPara.innerText = gun.gunName;
+        gunDiv.appendChild(gunPara);
+      }
       descBoxItemsDiv.appendChild(document.createElement('h4')).innerText = 'Starting Items';
       div.appendChild(descBox);
     }
