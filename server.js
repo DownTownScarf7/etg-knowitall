@@ -19,6 +19,7 @@ app.use(express.json());
 //   database: process.env.DB_DATABASE,
 // });
 
+const urlGamepedia = 'https://enterthegungeon.gamepedia.com';
 const urlGungeoneers = 'https://enterthegungeon.gamepedia.com/Gungeoneers';
 const dataGungeoneers = {};
 
@@ -36,7 +37,7 @@ request(urlGungeoneers, (err, res, body) => {
       dataGungeoneers[href.substring(1)] = {
         name,
         icon,
-        wikiLink: `${urlGungeoneers}${href}`,
+        wikiLink: `${urlGamepedia}${href}`,
       };
     };
   });
