@@ -9,7 +9,6 @@ window.onload = () => {
   requestGungeoneers.setRequestHeader("Content-Type", "application/json");
   requestGungeoneers.onload = () => {
     const res = JSON.parse(requestGungeoneers.responseText);
-    console.log(res);
     const mainDiv = document.querySelector('#gungeoneers');
     const subDiv = document.createElement('div');
     mainDiv.appendChild(document.createElement('h3')).innerText = 'GUNGONEERS';
@@ -38,6 +37,8 @@ window.onload = () => {
       descBox.appendChild(document.createElement('h3')).innerText = gungeoneer.name;
       descBox.appendChild(descBoxWeaponsDiv);
       descBox.appendChild(descBoxItemsDiv);
+      div.appendChild(descBox);
+
       descBoxWeaponsDiv.appendChild(document.createElement('h4')).innerText = 'Starting Weapons';
       for (let j in gungeoneer.startingWeapons) {
         const gun = gungeoneer.startingWeapons[j];
@@ -46,6 +47,7 @@ window.onload = () => {
         const gunPara = document.createElement('p');
         const gunImg = document.createElement('img');
 
+        gunDiv.classList.add('description-icon-wrapper');        
         gunImg.src = gun.gunSrc;
         gunImg.width = gun.gunImgSize.width;
         gunImg.height = gun.gunImgSize.height;
@@ -55,8 +57,25 @@ window.onload = () => {
         gunPara.innerText = gun.gunName;
         gunDiv.appendChild(gunPara);
       }
+
       descBoxItemsDiv.appendChild(document.createElement('h4')).innerText = 'Starting Items';
-      div.appendChild(descBox);
+      for (let j in gungeoneer.startingItems) {
+        const item = gungeoneer.startingItems[j];
+
+        const itemDiv = document.createElement('div');
+        const itemPara = document.createElement('p');
+        const itemImg = document.createElement('img');
+
+        itemDiv.classList.add('description-icon-wrapper');
+        itemImg.src = item.itemSrc;
+        itemImg.width = item.itemImgSize.width;
+        itemImg.height = item.itemImgSize.height;
+        itemImg.classList.add('description-icon');
+        descBoxItemsDiv.appendChild(itemDiv);
+        itemDiv.appendChild(itemImg);
+        itemPara.innerText = item.itemName;
+        itemDiv.appendChild(itemPara);
+      }
     }
   };
   requestGungeoneers.send();
