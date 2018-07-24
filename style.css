@@ -51,6 +51,10 @@ body {
   top: 0;
 }
 
+.description-icon {
+  image-rendering: pixelated;
+}
+
 .valid:hover .description-box {
   display: block;
 }
