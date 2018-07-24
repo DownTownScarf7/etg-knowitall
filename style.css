@@ -23,7 +23,9 @@ body {
 
 #description-wrapper {
   width: 30%;
-  border: 2px solid #000000;
+  height: 100vh;
+  background: #181818;
+  border: 3px solid #5e2121;
 }
 
 .wrapper {
@@ -46,13 +48,21 @@ body {
   display: none;
   position: fixed;
   width: 30%;
-  height: 70vh;
+  height: 100vh;
   right: 0;
   top: 0;
 }
 
+.description-icon-wrapper {
+  display: flex;
+  flex-direction: row;
+  color: #ffdb0c;
+  align-items: center;
+}
+
 .description-icon {
   image-rendering: pixelated;
+  margin: 10px;
 }
 
 .valid:hover .description-box {
