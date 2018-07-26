@@ -1,16 +1,16 @@
 'use strict';
 
 const api = 'http://localhost:8080/api';
-const requestGungeoneers = new XMLHttpRequest();
+const requestData = new XMLHttpRequest();
 
 
 window.onload = () => {
-  requestGungeoneers.open('GET', api, true);
-  requestGungeoneers.setRequestHeader("Content-Type", "application/json");
-  requestGungeoneers.onload = () => {
-    const res = JSON.parse(requestGungeoneers.responseText);
-    const mainDiv = document.querySelector('#gungeoneers');
-    const subDiv = document.createElement('div');
+  requestData.open('GET', api, true);
+  requestData.setRequestHeader("Content-Type", "application/json");
+  requestData.onload = () => {
+    const res = JSON.parse(requestData.responseText);
+    let mainDiv = document.querySelector('#gungeoneers');
+    let subDiv = document.createElement('div');
     mainDiv.appendChild(document.createElement('h3')).innerText = 'GUNGONEERS';
     subDiv.classList.add('icon-container');
     mainDiv.appendChild(subDiv);
@@ -24,6 +24,7 @@ window.onload = () => {
       const descBoxItemsDiv = document.createElement('div');
 
       div.classList.add('valid');
+      wikiLink.classList.add('wikiLink');
       wikiLink.href = gungeoneer.wikiLink;
       wikiLink.target = '_blank';
       img.classList.add('icon', 'gungeoneer');
@@ -77,15 +78,45 @@ window.onload = () => {
         itemDiv.appendChild(itemPara);
       }
     }
+
+    mainDiv = document.querySelector('#guns');
+    subDiv = document.createElement('div');
+    mainDiv.appendChild(document.createElement('h3')).innerText = 'GUNS';
+    subDiv.classList.add('icon-container');
+    mainDiv.appendChild(subDiv);
+
+    for (let i in res.dataGuns) {
+      const gun = res.dataGuns[i];
+      const div = document.createElement('div');
+
+      div.innerHTML = gun.gunImg;
+      const anchor = div.children[0];
+      const img = anchor.children[0];
+
+      anchor.href = gun.gunWikiLink;
+      anchor.target = '_blank';
+      anchor.className = 'wikiLink';
+      img.className = 'pixelart valid';
+      if (img.height < 15) {
+        img.width *= 2;
+        img.height *= 2;
+      } else if (img.height < 30) {
+        img.width *= 1.5;
+        img.height *= 1.5;
+      } else if (img.height > 40) {
+        img.width *= 0.8;
+        img.height *= 0.8;
+      }
+      subDiv.appendChild(div);
+    }
   };
-  requestGungeoneers.send();
+  requestData.send();
 
   document.querySelector('#search').addEventListener('keydown', event => {
     // Placeholder
     console.log(event.target.value);
   });
 
-  document.querySelector('#guns').appendChild(document.createElement('h3')).innerText = 'GUNS';
   document.querySelector('#items').appendChild(document.createElement('h3')).innerText = 'ITEMS';
   document.querySelector('#npcs').appendChild(document.createElement('h3')).innerText = 'NPCS';
   document.querySelector('#bosses').appendChild(document.createElement('h3')).innerText = 'BOSSES';
