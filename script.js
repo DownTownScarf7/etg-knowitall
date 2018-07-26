@@ -23,7 +23,7 @@ window.onload = () => {
       const descBoxWeaponsDiv = document.createElement('div');
       const descBoxItemsDiv = document.createElement('div');
 
-      div.classList.add('valid');
+      div.classList.add('hasDesc');
       wikiLink.classList.add('wikiLink');
       wikiLink.href = gungeoneer.wikiLink;
       wikiLink.target = '_blank';
@@ -88,31 +88,49 @@ window.onload = () => {
     for (let i in res.dataGuns) {
       const gun = res.dataGuns[i];
       const div = document.createElement('div');
+      const descBox = document.createElement('div');
 
+      div.classList.add('hasDesc');
       div.innerHTML = gun.gunImg;
-      const anchor = div.children[0];
-      const img = anchor.children[0];
-
-      anchor.href = gun.gunWikiLink;
-      anchor.target = '_blank';
-      anchor.className = 'wikiLink';
-      img.className = 'pixelart valid';
-      if (img.height < 15) {
-        img.width *= 2;
-        img.height *= 2;
-      } else if (img.height < 30) {
+      subDiv.appendChild(div);
+      const wikiLink = div.children[0];
+      const img = wikiLink.children[0];
+      
+      wikiLink.href = gun.gunWikiLink;
+      wikiLink.target = '_blank';
+      wikiLink.className = 'wikiLink';
+      img.className = 'pixelart';
+      if (img.height < 40) {
         img.width *= 1.5;
         img.height *= 1.5;
-      } else if (img.height > 40) {
-        img.width *= 0.8;
-        img.height *= 0.8;
+      } else {
+        img.width *= 0.7;
+        img.height *= 0.7;
       }
-      subDiv.appendChild(div);
+
+      div.appendChild(descBox);
+      descBox.classList.add('description-box');
+      
+      descBox.appendChild(document.createElement('h3')).innerText = gun.gunName;
+      descBox.appendChild(document.createElement('p')).innerText = gun.gunQuote;
+
+      const table = document.createElement('table');
+      table.classList.add('gunStats');
+      descBox.appendChild(table);
+      Object.values(gun.gunStats).forEach((stat, index) => {
+          table.appendChild(document.createElement('tr'));
+          table.children[index].appendChild(document.createElement('td')).innerText = ['Quality', 'Type', 'Magazine Size', 'Ammo Capacity', 'Damage', 'Fire Rate', 'Reload Time', 'Shot Speed', 'Range', 'Force', 'Spread'][index];
+          table.children[index].appendChild(document.createElement('td')).innerHTML = stat.replace(/\s/g, '') ? stat : '-';
+      });
+      if (gun.gunSmallNotes.replace(/\s/g, '')) {
+        descBox.appendChild(document.createElement('h4')).innerText = 'Small Notes';
+        descBox.appendChild(document.createElement('div')).appendChild(document.createElement('p')).innerText = gun.gunSmallNotes;
+      };
     }
   };
   requestData.send();
 
-  document.querySelector('#search').addEventListener('keydown', event => {
+  document.querySelector('#search').addEventListener('keyup', event => {
     // Placeholder
     console.log(event.target.value);
   });
