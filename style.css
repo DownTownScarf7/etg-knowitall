@@ -60,7 +60,8 @@ body {
   align-items: center;
 }
 
-.description-icon {
+.description-icon,
+.pixelart {
   image-rendering: pixelated;
   margin: 10px;
 }
