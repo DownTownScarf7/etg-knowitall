@@ -15,10 +15,29 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
+  z-index: 1;
+  margin-top: 34px;
+}
+
+#options-bar {
+  position: fixed;
+  border: 2px solid #9b9494;
+  background: #303030;
+  height: 30px;
+  width: 100%;
+  z-index: 3;
+  top: 0;
+}
+
+#search {
+  width: 300px;
+  height: 26px;
+  font-size: 20px;
 }
 
 #game-wrapper {
   width: 70%;
+  min-width: 306.14px;
 }
 
 #description-wrapper {
@@ -31,6 +50,17 @@ body {
 .wrapper {
   display: flex;
   flex-direction: column;
+}
+
+.wrapper h3 {
+  color: #ffffff;
+  background: #FF465C;
+  width: auto;
+  height: 30px;
+  text-transform: uppercase;
+  font-weight: bold;
+  line-height: 30px;
+  text-align: center;
 }
 
 .icon-container {
@@ -50,7 +80,7 @@ body {
   width: 30%;
   height: 100vh;
   right: 0;
-  top: 0;
+  top: 36px;
 }
 
 .description-icon-wrapper {
@@ -66,6 +96,6 @@ body {
   margin: 10px;
 }
 
-.valid:hover .description-box {
+.hasDesc:hover .description-box {
   display: block;
 }
