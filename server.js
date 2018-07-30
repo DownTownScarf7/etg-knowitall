@@ -103,9 +103,23 @@ request(`${urlGamepedia}/Guns`, (err, res, body) => {
           spread: columns.eq(13).text(),
         },
         gunSmallNotes: columns.eq(14).text(),
+        gunNotes: '-',
       }
+      request(`${urlGamepedia}${columns.eq(1).children('a').attr('href')}`, (err, res, body) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+
+        const $ = cheerio.load(body);
+
+        if ($('#Notes') && $('#Notes') != null) {
+          dataGuns[columns.eq(1).children('a').attr('href').substring(1)].gunNotes = $('#Notes').parent('h2').next('ul').html();
+        }
+      });
     }
   });
+  console.log('Data gathered, JSON ready.');
 });
 
 app.get('/', (req, res) => {
