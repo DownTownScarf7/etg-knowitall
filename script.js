@@ -126,6 +126,10 @@ window.onload = () => {
         descBox.appendChild(document.createElement('h4')).innerText = 'Small Notes';
         descBox.appendChild(document.createElement('div')).appendChild(document.createElement('p')).innerText = gun.gunSmallNotes;
       };
+      if (gun.gunNotes) {
+        descBox.appendChild(document.createElement('h4')).innerText = 'Notes';
+        descBox.appendChild(document.createElement('div')).appendChild(document.createElement('ul')).innerHTML = gun.gunNotes;
+      }
     }
   };
   requestData.send();
