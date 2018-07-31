@@ -71,6 +71,8 @@ request(`${urlGamepedia}/Gungeoneers`, (err, res, body) => {
       };
     };
   });
+
+  console.log('Gungeoneer data gathered, JSON ready.');
 });
 
 request(`${urlGamepedia}/Guns`, (err, res, body) => {
@@ -119,7 +121,48 @@ request(`${urlGamepedia}/Guns`, (err, res, body) => {
       });
     }
   });
-  console.log('Data gathered, JSON ready.');
+
+  console.log('Gun data gathered, JSON ready.');
+});
+
+request(`${urlGamepedia}/Items`, (err, res, body) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+
+  const $ = cheerio.load(body);
+  $('table tbody tr').each(function () {
+    const columns = $(this).find('td');
+
+    if (columns.length > 0) {
+      dataItems[columns.eq(1).children('a').attr('href').substring(1)] = {
+        itemImg: columns.eq(0).html(),
+        itemName: columns.eq(1).children('a').text(),
+        itemWikiLink: `${urlGamepedia}${columns.eq(1).children('a').attr('href')}`,
+        itemType: columns.eq(2).text().replace(/\s/g, ''),
+        itemQuote: columns.eq(3).text(),
+        itemQuality: columns.eq(4).html(),
+        itemEffect: columns.eq(5).text(),
+        itemNotes: '-',
+      }
+
+      request(`${urlGamepedia}${columns.eq(1).children('a').attr('href')}`, (err, res, body) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+
+        const $ = cheerio.load(body);
+
+        if ($('#Notes') && $('#Notes') != null) {
+          dataItems[columns.eq(1).children('a').attr('href').substring(1)].itemNotes = $('#Notes').parent('h2').next('ul').html();
+        }
+      });
+    }
+  });
+
+  console.log('Item data gathered, JSON ready.');
 });
 
 app.get('/', (req, res) => {
@@ -130,6 +173,7 @@ app.get('/api', (req, res) => {
   res.json({
     dataGungeoneers,
     dataGuns,
+    dataItems,
   });
 });
 
