@@ -131,15 +131,63 @@ window.onload = () => {
         descBox.appendChild(document.createElement('div')).appendChild(document.createElement('ul')).innerHTML = gun.gunNotes;
       }
     }
+
+    mainDiv = document.querySelector('#items');
+    subDiv = document.createElement('div');
+    mainDiv.appendChild(document.createElement('h3')).innerText = 'ITEMS';
+    subDiv.classList.add('icon-container');
+    mainDiv.appendChild(subDiv);
+
+    for (let i in res.dataItems) {
+      const item = res.dataItems[i];
+      const div = document.createElement('div');
+      const descBox = document.createElement('div');
+
+      div.classList.add('hasDesc');
+      div.innerHTML = item.itemImg;
+      subDiv.appendChild(div);
+      const wikiLink = div.children[0];
+      const img = wikiLink.children[0];
+      
+      wikiLink.href = item.itemWikiLink;
+      wikiLink.target = '_blank';
+      wikiLink.className = 'wikiLink';
+      img.className = 'pixelart';
+      if (img.height < 40) {
+        img.width *= 1.5;
+        img.height *= 1.5;
+      } else {
+        img.width *= 0.7;
+        img.height *= 0.7;
+      }
+      
+      div.appendChild(descBox);
+      descBox.classList.add('description-box');
+      
+      descBox.appendChild(document.createElement('h3')).innerText = item.itemName;
+      descBox.appendChild(document.createElement('p')).innerText = item.itemQuote;
+
+      descBox.appendChild(document.createElement('h4')).innerText = 'Effect';
+      descBox.appendChild(document.createElement('div')).appendChild(document.createElement('p')).innerText = item.itemEffect;
+
+      if (item.itemNotes) {
+        descBox.appendChild(document.createElement('h4')).innerText = 'Notes';
+        descBox.appendChild(document.createElement('div')).appendChild(document.createElement('ul')).innerHTML = item.itemNotes;
+      }
+    }
   };
   requestData.send();
 
   document.querySelector('#search').addEventListener('keyup', event => {
-    // Placeholder
-    console.log(event.target.value);
+    document.querySelectorAll('.hasDesc').forEach(elem => {
+      if (elem.children[1].innerText.toLowerCase().indexOf(event.target.value.toLowerCase()) < 0) {
+        elem.style.display = 'none';
+      } else {
+        elem.style.display = 'block';
+      }
+    });
   });
 
-  document.querySelector('#items').appendChild(document.createElement('h3')).innerText = 'ITEMS';
   document.querySelector('#npcs').appendChild(document.createElement('h3')).innerText = 'NPCS';
   document.querySelector('#bosses').appendChild(document.createElement('h3')).innerText = 'BOSSES';
   document.querySelector('#cult').appendChild(document.createElement('h3')).innerText = 'CULT OF THE GUNDEAD';
