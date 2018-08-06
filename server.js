@@ -1,8 +1,6 @@
 'use strict';
 
-require('dotenv').config();
 const express = require('express');
-const mysql = require('mysql');
 const path = require('path');
 const cheerio = require('cheerio');
 const request = require('request');
@@ -12,17 +10,16 @@ const PORT = 8080;
 app.use(express.static(__dirname));
 app.use(express.json());
 
-// const conn = mysql.createConnection({
-//   host: process.env.DB_HOST,
-//   user: process.env.DB_USER,
-//   password: process.env.DB_PASSWORD,
-//   database: process.env.DB_DATABASE,
-// });
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 
 const urlGamepedia = 'https://enterthegungeon.gamepedia.com';
-const dataGungeoneers = {};
-const dataGuns = {};
-const dataItems = {};
+const gungeoneers = [];
+const guns = [];
+const items = [];
 
 request(`${urlGamepedia}/Gungeoneers`, (err, res, body) => {
   if (err) {
@@ -34,41 +31,42 @@ request(`${urlGamepedia}/Gungeoneers`, (err, res, body) => {
   $('#mw-content-text table tr').each(function () {
     if ($(this).children('td').length > 0) {
       const gungeoneer = $(this).children('td').eq(0);
-      const weapons = $(this).children('td').eq(1);
-      const items = $(this).children('td').eq(2);
-      const name = gungeoneer.find('a').attr('title');
-      const icon = gungeoneer.find('img').attr('src');
-      const href = gungeoneer.eq(0).find('a').attr('href');
-      const startingWeapons = {};
-      const startingItems = {};
+      const dataStartingWeapons = [];
+      const dataStartingItems = [];
 
-      weapons.find('a').not('.image').each(function (index) {
+      $(this).children('td').eq(1).find('a').not('.image').each(function () {
         const gunImg = $(this).prev('.image').children('img');
-        startingWeapons[$(this).attr('href').substring(1)] = {
-          gunName: $(this).attr('title'),
-          gunLink: $(this).attr('href'),
-          gunSrc: gunImg.attr('src'),
-          gunImgSize: { width: gunImg.attr('width'), height: gunImg.attr('height') },
-          }
+        dataStartingWeapons.push({
+          name: $(this).attr('title'),
+          wikiLink: `${urlGamepedia}${$(this).attr('href')}`,
+          img: {
+            src: gunImg.attr('src'),
+            width: gunImg.attr('width'),
+            height: gunImg.attr('height'),
+          },
+        });
       });
 
-      items.find('a').not('.image').each(function (index) {
+      $(this).children('td').eq(2).find('a').not('.image').each(function () {
         const itemImg = $(this).prev('.image').children('img');
-        startingItems[$(this).attr('href').substring(1)] = {
-          itemName: $(this).attr('title'),
-          itemLink: $(this).attr('href'),
-          itemSrc: itemImg.attr('src'),
-          itemImgSize: { width: itemImg.attr('width'), height: itemImg.attr('height') },
-          }
+        dataStartingItems.push({
+          name: $(this).attr('title'),
+          wikiLink: `${urlGamepedia}${$(this).attr('href')}`,
+          img: {
+            src: itemImg.attr('src'),
+            width: itemImg.attr('width'),
+            height: itemImg.attr('height'),
+          },
+        });
       });
 
-      dataGungeoneers[href.substring(1)] = {
-        name,
-        icon,
-        startingWeapons,
-        startingItems,
-        wikiLink: `${urlGamepedia}${href}`,
-      };
+      gungeoneers.push({
+        name: gungeoneer.find('a').attr('title'),
+        icon: gungeoneer.find('img').attr('src'),
+        startingWeapons: dataStartingWeapons,
+        startingItems: dataStartingItems,
+        wikiLink: `${urlGamepedia}${gungeoneer.eq(0).find('a').attr('href')}`,
+      });
     };
   });
 
@@ -82,16 +80,17 @@ request(`${urlGamepedia}/Guns`, (err, res, body) => {
   }
 
   const $ = cheerio.load(body);
-  $('table tbody tr').each(function () {
+  $('table tbody tr').each(function (index) {
     const columns = $(this).find('td');
 
+    
     if (columns.length > 0) {
-      dataGuns[columns.eq(1).children('a').attr('href').substring(1)] = {
-        gunImg: columns.eq(0).html(),
-        gunName: columns.eq(1).children('a').text(),
-        gunWikiLink: `${urlGamepedia}${columns.eq(1).children('a').attr('href')}`,
-        gunQuote: columns.eq(2).text(),
-        gunStats: {
+      guns.push({
+        imgHtml: columns.eq(0).html(),
+        name: columns.eq(1).children('a').text(),
+        wikiLink: `${urlGamepedia}${columns.eq(1).children('a').attr('href')}`,
+        quote: columns.eq(2).text(),
+        stats: {
           quality: columns.eq(3).children().html(),
           type: columns.eq(4).text(),
           magSize: columns.eq(5).html(),
@@ -104,9 +103,10 @@ request(`${urlGamepedia}/Guns`, (err, res, body) => {
           force: columns.eq(12).html(),
           spread: columns.eq(13).text(),
         },
-        gunSmallNotes: columns.eq(14).text(),
-        gunNotes: '-',
-      }
+        smallNotes: columns.eq(14).text(),
+        notesHtml: '-',
+      });
+
       request(`${urlGamepedia}${columns.eq(1).children('a').attr('href')}`, (err, res, body) => {
         if (err) {
           console.error(err);
@@ -116,7 +116,7 @@ request(`${urlGamepedia}/Guns`, (err, res, body) => {
         const $ = cheerio.load(body);
 
         if ($('#Notes') && $('#Notes') != null) {
-          dataGuns[columns.eq(1).children('a').attr('href').substring(1)].gunNotes = $('#Notes').parent('h2').next('ul').html();
+          guns[index - 1].notesHtml = $('#Notes').parent('h2').next('ul').html();
         }
       });
     }
@@ -132,20 +132,20 @@ request(`${urlGamepedia}/Items`, (err, res, body) => {
   }
 
   const $ = cheerio.load(body);
-  $('table tbody tr').each(function () {
+  $('table tbody tr').each(function (index) {
     const columns = $(this).find('td');
 
     if (columns.length > 0) {
-      dataItems[columns.eq(1).children('a').attr('href').substring(1)] = {
-        itemImg: columns.eq(0).html(),
-        itemName: columns.eq(1).children('a').text(),
-        itemWikiLink: `${urlGamepedia}${columns.eq(1).children('a').attr('href')}`,
-        itemType: columns.eq(2).text().replace(/\s/g, ''),
-        itemQuote: columns.eq(3).text(),
-        itemQuality: columns.eq(4).html(),
-        itemEffect: columns.eq(5).text(),
-        itemNotes: '-',
-      }
+      items.push({
+        imgHtml: columns.eq(0).html(),
+        name: columns.eq(1).children('a').text(),
+        wikiLink: `${urlGamepedia}${columns.eq(1).children('a').attr('href')}`,
+        type: columns.eq(2).text().replace(/\s/g, ''),
+        quote: columns.eq(3).text(),
+        quality: columns.eq(4).html(),
+        effect: columns.eq(5).text(),
+        notesHtml: '-',
+      });
 
       request(`${urlGamepedia}${columns.eq(1).children('a').attr('href')}`, (err, res, body) => {
         if (err) {
@@ -156,7 +156,7 @@ request(`${urlGamepedia}/Items`, (err, res, body) => {
         const $ = cheerio.load(body);
 
         if ($('#Notes') && $('#Notes') != null) {
-          dataItems[columns.eq(1).children('a').attr('href').substring(1)].itemNotes = $('#Notes').parent('h2').next('ul').html();
+          items[index - 1].notesHtml = $('#Notes').parent('h2').next('ul').html();
         }
       });
     }
@@ -171,9 +171,9 @@ app.get('/', (req, res) => {
 
 app.get('/api', (req, res) => {
   res.json({
-    dataGungeoneers,
-    dataGuns,
-    dataItems,
+    gungeoneers,
+    guns,
+    items,
   });
 });
 
